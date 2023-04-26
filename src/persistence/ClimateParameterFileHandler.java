@@ -6,9 +6,10 @@ import parameters.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClimateParameterFileHandler extends FileHandler{
-//Altitudine Ghiacciai (m);Score;descrizione;Massa dei Ghiacciai (Kg);Score;descrizione
     private static final String FILENAME = "ParametriClimatici.csv";
     private static final int ID_COLUMN = 0;
     private static final int OPERATOR_COLUMN = 1;
@@ -81,6 +82,93 @@ public class ClimateParameterFileHandler extends FileHandler{
             super.closeFile();
 
             throw new ElementNotFoundException("operator not found! searched id: " + id);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public List<ClimateParameter> selectByOperator(String nick) throws FileNotFoundException, ElementNotFoundException{
+        super.openFile();
+        String line;
+        String[] columns;
+        List<ClimateParameter> list = new ArrayList<>();
+
+
+        try {
+            super.readLineFromFile(); // ignore first line
+            line = super.readLineFromFile();
+
+            while(line != null) {
+                columns = super.parseCsvLine(line);
+
+                if (columns[OPERATOR_COLUMN].compareTo(nick) == 0) {
+                    list.add(new ClimateParameter(Long.parseLong(columns[ID_COLUMN]),
+                            columns[OPERATOR_COLUMN], Long.parseLong(columns[AREA_COLUMN]), Long.parseLong(columns[DATE_COLUMN]),
+                            new Wind(Float.parseFloat(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
+                            new Humidity(Integer.parseInt(columns[HUMIDITY_COLUMN]), Byte.parseByte(columns[HUMIDITY_SCORE_COLUMN]), columns[HUMIDITY_DESCRIPTION_COLUMN]),
+                            new Pression(Integer.parseInt(columns[PRESSION_COLUMN]), Byte.parseByte(columns[PRESSION_SCORE_COLUMN]), columns[PRESSION_DESCRIPTION_COLUMN]),
+                            new Temperature(Integer.parseInt(columns[TEMPERATURE_COLUMN]), Byte.parseByte(columns[TEMPERATURE_SCORE_COLUMN]), columns[TEMPERATURE_DESCRIPTION_COLUMN]),
+                            new RainFall(Integer.parseInt(columns[RAINFALL_COLUMN]), Byte.parseByte(columns[RAINFALL_SCORE_COLUMN]), columns[RAINFALL_DESCRIPTION_COLUMN]),
+                            new GlaciersAltitude(Integer.parseInt(columns[GLACIERS_ALTITUDE_COLUMN]), Byte.parseByte(columns[GLACIERS_ALTITUDE_SCORE_COLUMN]), columns[GLACIERS_ALTITUDE_DESCRIPTION_COLUMN]),
+                            new GlaciersMass(Integer.parseInt(columns[GLACIERS_MASS_COLUMN]), Byte.parseByte(columns[GLACIERS_MASS_SCORE_COLUMN]), columns[GLACIERS_MASS_DESCRIPTION_COLUMN])
+                    ));
+                }
+
+                line = super.readLineFromFile();
+
+            }
+
+            super.closeFile();
+
+            if(list.isEmpty())
+                throw new ElementNotFoundException("operator not found! searched nick: " + nick);
+            else
+                return list;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<ClimateParameter> selectByArea(long areaId) throws FileNotFoundException, ElementNotFoundException{
+        super.openFile();
+        String line;
+        String[] columns;
+        List<ClimateParameter> list = new ArrayList<>();
+
+
+        try {
+            super.readLineFromFile(); // ignore first line
+            line = super.readLineFromFile();
+
+            while(line != null) {
+                columns = super.parseCsvLine(line);
+
+                if (Long.parseLong(columns[AREA_COLUMN]) == areaId) {
+                    list.add(new ClimateParameter(Long.parseLong(columns[ID_COLUMN]),
+                            columns[OPERATOR_COLUMN], Long.parseLong(columns[AREA_COLUMN]), Long.parseLong(columns[DATE_COLUMN]),
+                            new Wind(Float.parseFloat(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
+                            new Humidity(Integer.parseInt(columns[HUMIDITY_COLUMN]), Byte.parseByte(columns[HUMIDITY_SCORE_COLUMN]), columns[HUMIDITY_DESCRIPTION_COLUMN]),
+                            new Pression(Integer.parseInt(columns[PRESSION_COLUMN]), Byte.parseByte(columns[PRESSION_SCORE_COLUMN]), columns[PRESSION_DESCRIPTION_COLUMN]),
+                            new Temperature(Integer.parseInt(columns[TEMPERATURE_COLUMN]), Byte.parseByte(columns[TEMPERATURE_SCORE_COLUMN]), columns[TEMPERATURE_DESCRIPTION_COLUMN]),
+                            new RainFall(Integer.parseInt(columns[RAINFALL_COLUMN]), Byte.parseByte(columns[RAINFALL_SCORE_COLUMN]), columns[RAINFALL_DESCRIPTION_COLUMN]),
+                            new GlaciersAltitude(Integer.parseInt(columns[GLACIERS_ALTITUDE_COLUMN]), Byte.parseByte(columns[GLACIERS_ALTITUDE_SCORE_COLUMN]), columns[GLACIERS_ALTITUDE_DESCRIPTION_COLUMN]),
+                            new GlaciersMass(Integer.parseInt(columns[GLACIERS_MASS_COLUMN]), Byte.parseByte(columns[GLACIERS_MASS_SCORE_COLUMN]), columns[GLACIERS_MASS_DESCRIPTION_COLUMN])
+                    ));
+                }
+
+                line = super.readLineFromFile();
+
+            }
+
+            super.closeFile();
+
+            if(list.isEmpty())
+                throw new ElementNotFoundException("operator not found! searched area: " + areaId);
+            else
+                return list;
 
         } catch (IOException e) {
             throw new RuntimeException(e);

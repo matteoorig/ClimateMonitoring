@@ -12,7 +12,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 class ClimateMonitor {
 
@@ -24,10 +26,11 @@ class ClimateMonitor {
 
         ClimateParameterFileHandler f = ClimateParameterFileHandler.getInstance();
         ClimateParameter mon;
+        List<ClimateParameter> list = new ArrayList<>();
 
         try {
-            mon = f.selectById(1);
-            System.out.println(mon.toString());
+            list = f.selectByArea(1);
+            System.out.println(list.toString());
 
         } catch (FileNotFoundException e) {
             throw new RuntimeException("cannot locate file!");
