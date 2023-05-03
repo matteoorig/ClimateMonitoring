@@ -1,7 +1,7 @@
 package persistence;
 
 import javabeans.MonitoringCenter;
-import javabeans.Operator;
+import javabeans.MonitoringCoordinate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,9 +27,9 @@ public class MonitoringCenterFileHandler extends FileHandler{
             return instance;
     }
 
-    public MonitoringCenter selectByName(String name) throws FileNotFoundException, ElementNotFoundException{
+    public MonitoringCenter selectByName(String name) throws IOException, ElementNotFoundException{
 
-        super.openFile();
+        super.openReading();
         String line;
         String[] columns;
 
@@ -49,7 +49,7 @@ public class MonitoringCenterFileHandler extends FileHandler{
 
             }
 
-            super.closeFile();
+            super.closeReading();
 
             throw new ElementNotFoundException("operator not found! searched name: " + name);
 
@@ -71,5 +71,14 @@ public class MonitoringCenterFileHandler extends FileHandler{
             list[i] = Long.parseLong(array[i]);
 
         return list;
+    }
+
+    public void writeMonitoringCenterInFile(MonitoringCenter cen) throws IOException {
+        super.openWriting();
+
+        super.writeLineInFile(cen.getName() + CSV_DELIMETER + cen.getAddress() + CSV_DELIMETER +
+                cen.getAreaList());
+
+        super.closeWriting();
     }
 }

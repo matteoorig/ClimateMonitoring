@@ -4,7 +4,6 @@ import javabeans.ClimateParameter;
 import javabeans.MonitoringCoordinate;
 import parameters.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +49,8 @@ public class ClimateParameterFileHandler extends FileHandler{
             return instance;
     }
 
-    public ClimateParameter selectById(long id) throws FileNotFoundException, ElementNotFoundException{
-        super.openFile();
+    public ClimateParameter selectById(long id) throws IOException, ElementNotFoundException{
+        super.openReading();
         String line;
         String[] columns;
 
@@ -65,7 +64,7 @@ public class ClimateParameterFileHandler extends FileHandler{
                 if (Long.parseLong(columns[ID_COLUMN]) == id) {
                     return new ClimateParameter(Long.parseLong(columns[ID_COLUMN]),
                      columns[OPERATOR_COLUMN], Long.parseLong(columns[AREA_COLUMN]), Long.parseLong(columns[DATE_COLUMN]),
-                            new Wind(Float.parseFloat(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
+                            new Wind(Integer.parseInt(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
                             new Humidity(Integer.parseInt(columns[HUMIDITY_COLUMN]), Byte.parseByte(columns[HUMIDITY_SCORE_COLUMN]), columns[HUMIDITY_DESCRIPTION_COLUMN]),
                             new Pression(Integer.parseInt(columns[PRESSION_COLUMN]), Byte.parseByte(columns[PRESSION_SCORE_COLUMN]), columns[PRESSION_DESCRIPTION_COLUMN]),
                             new Temperature(Integer.parseInt(columns[TEMPERATURE_COLUMN]), Byte.parseByte(columns[TEMPERATURE_SCORE_COLUMN]), columns[TEMPERATURE_DESCRIPTION_COLUMN]),
@@ -79,7 +78,7 @@ public class ClimateParameterFileHandler extends FileHandler{
 
             }
 
-            super.closeFile();
+            super.closeReading();
 
             throw new ElementNotFoundException("operator not found! searched id: " + id);
 
@@ -89,8 +88,8 @@ public class ClimateParameterFileHandler extends FileHandler{
 
     }
 
-    public List<ClimateParameter> selectByOperator(String nick) throws FileNotFoundException, ElementNotFoundException{
-        super.openFile();
+    public List<ClimateParameter> selectByOperator(String nick) throws IOException, ElementNotFoundException{
+        super.openReading();
         String line;
         String[] columns;
         List<ClimateParameter> list = new ArrayList<>();
@@ -106,7 +105,7 @@ public class ClimateParameterFileHandler extends FileHandler{
                 if (columns[OPERATOR_COLUMN].compareTo(nick) == 0) {
                     list.add(new ClimateParameter(Long.parseLong(columns[ID_COLUMN]),
                             columns[OPERATOR_COLUMN], Long.parseLong(columns[AREA_COLUMN]), Long.parseLong(columns[DATE_COLUMN]),
-                            new Wind(Float.parseFloat(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
+                            new Wind(Integer.parseInt(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
                             new Humidity(Integer.parseInt(columns[HUMIDITY_COLUMN]), Byte.parseByte(columns[HUMIDITY_SCORE_COLUMN]), columns[HUMIDITY_DESCRIPTION_COLUMN]),
                             new Pression(Integer.parseInt(columns[PRESSION_COLUMN]), Byte.parseByte(columns[PRESSION_SCORE_COLUMN]), columns[PRESSION_DESCRIPTION_COLUMN]),
                             new Temperature(Integer.parseInt(columns[TEMPERATURE_COLUMN]), Byte.parseByte(columns[TEMPERATURE_SCORE_COLUMN]), columns[TEMPERATURE_DESCRIPTION_COLUMN]),
@@ -120,7 +119,7 @@ public class ClimateParameterFileHandler extends FileHandler{
 
             }
 
-            super.closeFile();
+            super.closeReading();
 
             if(list.isEmpty())
                 throw new ElementNotFoundException("operator not found! searched nick: " + nick);
@@ -132,8 +131,8 @@ public class ClimateParameterFileHandler extends FileHandler{
         }
     }
 
-    public List<ClimateParameter> selectByArea(long areaId) throws FileNotFoundException, ElementNotFoundException{
-        super.openFile();
+    public List<ClimateParameter> selectByArea(long areaId) throws IOException, ElementNotFoundException{
+        super.openReading();
         String line;
         String[] columns;
         List<ClimateParameter> list = new ArrayList<>();
@@ -149,7 +148,7 @@ public class ClimateParameterFileHandler extends FileHandler{
                 if (Long.parseLong(columns[AREA_COLUMN]) == areaId) {
                     list.add(new ClimateParameter(Long.parseLong(columns[ID_COLUMN]),
                             columns[OPERATOR_COLUMN], Long.parseLong(columns[AREA_COLUMN]), Long.parseLong(columns[DATE_COLUMN]),
-                            new Wind(Float.parseFloat(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
+                            new Wind(Integer.parseInt(columns[WIND_COLUMN]), Byte.parseByte(columns[WIND_SCORE_COLUMN]), columns[WIND_DESCRIPTION_COLUMN]),
                             new Humidity(Integer.parseInt(columns[HUMIDITY_COLUMN]), Byte.parseByte(columns[HUMIDITY_SCORE_COLUMN]), columns[HUMIDITY_DESCRIPTION_COLUMN]),
                             new Pression(Integer.parseInt(columns[PRESSION_COLUMN]), Byte.parseByte(columns[PRESSION_SCORE_COLUMN]), columns[PRESSION_DESCRIPTION_COLUMN]),
                             new Temperature(Integer.parseInt(columns[TEMPERATURE_COLUMN]), Byte.parseByte(columns[TEMPERATURE_SCORE_COLUMN]), columns[TEMPERATURE_DESCRIPTION_COLUMN]),
@@ -163,7 +162,7 @@ public class ClimateParameterFileHandler extends FileHandler{
 
             }
 
-            super.closeFile();
+            super.closeReading();
 
             if(list.isEmpty())
                 throw new ElementNotFoundException("operator not found! searched area: " + areaId);
@@ -174,5 +173,21 @@ public class ClimateParameterFileHandler extends FileHandler{
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void writeClimateParameterInFile(ClimateParameter param) throws IOException {
+        super.openWriting();
+
+        super.writeLineInFile(param.getId() + CSV_DELIMETER +
+                param.getOperatorNickname()  + CSV_DELIMETER + param.getAreaOfInterest() + CSV_DELIMETER + param.getDate()  + CSV_DELIMETER +
+                param.getWind().getValue()  + CSV_DELIMETER + param.getWind().getScore() + CSV_DELIMETER + param.getWind().getDescription() + CSV_DELIMETER +
+                param.getHumidity().getValue() + CSV_DELIMETER + param.getHumidity().getScore() + CSV_DELIMETER + param.getHumidity().getDescription() + CSV_DELIMETER +
+                param.getPression().getValue() + CSV_DELIMETER + param.getPression().getScore() + CSV_DELIMETER + param.getPression().getDescription() + CSV_DELIMETER +
+                param.getTemperature().getValue() + CSV_DELIMETER + param.getTemperature().getScore() + CSV_DELIMETER + param.getTemperature().getDescription() + CSV_DELIMETER +
+                param.getRainfall().getValue() + CSV_DELIMETER + param.getRainfall().getScore() + CSV_DELIMETER + param.getRainfall().getDescription() + CSV_DELIMETER +
+                param.getGlaciersAltitude().getValue() + CSV_DELIMETER + param.getGlaciersAltitude().getScore() + CSV_DELIMETER + param.getGlaciersAltitude().getDescription() + CSV_DELIMETER +
+                param.getGlaciersMass().getValue() + CSV_DELIMETER + param.getGlaciersMass().getScore() + CSV_DELIMETER + param.getGlaciersMass().getDescription());
+
+        super.closeWriting();
     }
 }

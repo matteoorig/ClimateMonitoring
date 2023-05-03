@@ -1,6 +1,7 @@
 import javabeans.ClimateParameter;
 import javabeans.MonitoringCoordinate;
 import javabeans.Operator;
+import parameters.*;
 import persistence.ClimateParameterFileHandler;
 import persistence.ElementNotFoundException;
 import persistence.MonitoringCoordinateFileHandler;
@@ -25,18 +26,23 @@ class ClimateMonitor {
         System.out.println(date);
 
         ClimateParameterFileHandler f = ClimateParameterFileHandler.getInstance();
-        ClimateParameter mon;
-        List<ClimateParameter> list = new ArrayList<>();
+        ClimateParameter mon = new ClimateParameter(2, "mori", 1, 82346286,
+                new Wind(1, (byte) 1, "aaa"),
+                new Humidity(2,  (byte) 2, "bbb"),
+                new Pression(3,  (byte) 3, "ccc"),
+                new Temperature(4,  (byte) 4, "ddd"),
+                new RainFall(5,  (byte) 5, "eee"),
+                new GlaciersAltitude(1,  (byte) 5, "fff"),
+                new GlaciersMass(2,  (byte) 2, "alk"));
 
         try {
-            list = f.selectByArea(1);
-            System.out.println(list.toString());
+            f.writeClimateParameterInFile(mon);
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException("cannot locate file!");
-        } catch (ElementNotFoundException e) {
-            throw new RuntimeException("element not found!");
-        }
+        } /*catch (ElementNotFoundException e) {
+            throw new RuntimeException("cannot locate file!");
+        }*/
 
     }
 

@@ -1,7 +1,7 @@
 package persistence;
 
-import javabeans.MonitoringCenter;
 import javabeans.MonitoringCoordinate;
+import javabeans.Operator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,9 +29,9 @@ public class MonitoringCoordinateFileHandler extends FileHandler{
             return instance;
     }
 
-    public MonitoringCoordinate selectByGeoname(long geoname) throws FileNotFoundException, ElementNotFoundException{
+    public MonitoringCoordinate selectByGeoname(long geoname) throws IOException, ElementNotFoundException{
 
-        super.openFile();
+        super.openReading();
         String line;
         String[] columns;
 
@@ -52,7 +52,7 @@ public class MonitoringCoordinateFileHandler extends FileHandler{
 
             }
 
-            super.closeFile();
+            super.closeReading();
 
             throw new ElementNotFoundException("operator not found! searched geoname: " + geoname);
 
@@ -62,10 +62,10 @@ public class MonitoringCoordinateFileHandler extends FileHandler{
 
     }
 
-    public List<MonitoringCoordinate> selectByCountryCode(String countryCode) throws FileNotFoundException, ElementNotFoundException{
+    public List<MonitoringCoordinate> selectByCountryCode(String countryCode) throws IOException, ElementNotFoundException{
 
         List<MonitoringCoordinate> list = new ArrayList<>();
-        super.openFile();
+        super.openReading();
         String line;
         String[] columns;
 
@@ -85,7 +85,7 @@ public class MonitoringCoordinateFileHandler extends FileHandler{
                 line = super.readLineFromFile();
 
             }
-            super.closeFile();
+            super.closeReading();
 
             if(list.isEmpty())
                 throw new ElementNotFoundException("operator not found! searched country code: " + countryCode);
@@ -96,6 +96,16 @@ public class MonitoringCoordinateFileHandler extends FileHandler{
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void writeMonitoringCoordinateInFile(MonitoringCoordinate mon) throws IOException {
+        super.openWriting();
+
+        super.writeLineInFile(mon.getGeonameId() + CSV_DELIMETER + mon.getLatitude() + CSV_DELIMETER +
+                                 mon.getLongitude() + CSV_DELIMETER + mon.getDanomination() + CSV_DELIMETER +
+                                 mon.getCountryCode());
+
+        super.closeWriting();
     }
 
 }
